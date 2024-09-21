@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Форма для создания Telegram бота</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 20px; }
+        label { display: block; margin-top: 10px; }
+        input[type="text"] { width: 100%; padding: 5px; margin-top: 5px; }
+        input[type="submit"] { margin-top: 20px; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Создание Telegram бота</h1>
+    <form id="botForm">
+        <label for="student_name">Ваше имя:</label>
+        <input type="text" id="student_name" name="student_name" required>
+
+        <label for="telegram_token">TELEGRAM_TOKEN:</label>
+        <input type="text" id="telegram_token" name="telegram_token" required>
+
+        <label for="replicate_token">REPLICATE_API_TOKEN:</label>
+        <input type="text" id="replicate_token" name="replicate_token" required>
+
+        <label for="openai_key">OPENAI_API_KEY:</label>
+        <input type="text" id="openai_key" name="openai_key" required>
+
+        <label for="assistant_id">ASSISTANT_ID:</label>
+        <input type="text" id="assistant_id" name="assistant_id" required>
+
+        <label for="hf_lora">hf_lora:</label>
+        <input type="text" id="hf_lora" name="hf_lora" required>
+
+        <input type="submit" value="Создать бота">
+    </form>
+
+    <script>
+        document.getElementById('botForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            var formData = new FormData(this);
+            
+            fetch('http://45.133.216.252:5000/create_bot', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                alert(data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Произошла ошибка при создании бота');
+            });
+        });
+    </script>
+</body>
+</html>
