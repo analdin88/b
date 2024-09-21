@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Форма для создания Telegram бота</title>
+    <title>Создание Telegram бота</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 20px; }
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
         label { display: block; margin-top: 10px; }
         input[type="text"] { width: 100%; padding: 5px; margin-top: 5px; }
         input[type="submit"] { margin-top: 20px; padding: 10px; }
+        #logs { margin-top: 20px; border: 1px solid #ccc; padding: 10px; height: 200px; overflow-y: scroll; }
     </style>
 </head>
 <body>
@@ -35,6 +36,11 @@
         <input type="submit" value="Создать бота">
     </form>
 
+    <div id="logs">
+        <h3>Логи:</h3>
+        <pre id="logContent"></pre>
+    </div>
+
     <script>
         document.getElementById('botForm').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -45,15 +51,17 @@
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.text())
+            .then(response => response.json())
             .then(data => {
-                alert(data);
+                alert(data.message || data.error);
+                updateLogs();
             })
             .catch(error => {
                 console.error('Error:', error);
                 alert('Произошла ошибка при создании бота');
             });
         });
-    </script>
-</body>
-</html>
+
+        function updateLogs() {
+            fetch('http://45.133.216.252:5000/logs')
+            .then(response => response.json())
