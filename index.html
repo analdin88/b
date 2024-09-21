@@ -5,11 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Создание Telegram бота</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
         label { display: block; margin-top: 10px; }
         input[type="text"] { width: 100%; padding: 5px; margin-top: 5px; }
         input[type="submit"] { margin-top: 20px; padding: 10px; }
-        #logs { margin-top: 20px; border: 1px solid #ccc; padding: 10px; height: 200px; overflow-y: scroll; }
+        #logs { margin-top: 20px; border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: scroll; }
+        #status { margin-top: 20px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -36,6 +37,7 @@
         <input type="submit" value="Создать бота">
     </form>
 
+    <div id="status"></div>
     <div id="logs">
         <h3>Логи:</h3>
         <pre id="logContent"></pre>
@@ -46,22 +48,41 @@
             e.preventDefault();
             
             var formData = new FormData(this);
+            document.getElementById('status').textContent = 'Отправка данных...';
             
             fetch('http://45.133.216.252:5000/create_bot', {
                 method: 'POST',
-                body: formData
+                body: formData,
+                mode: 'cors'
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Ошибка сети: ' + response.status);
+                }
+                return response.json();
+            })
             .then(data => {
-                alert(data.message || data.error);
+                console.log(data);
+                document.getElementById('status').textContent = data.message || data.error;
                 updateLogs();
             })
             .catch(error => {
-                console.error('Error:', error);
-                alert('Произошла ошибка при создании бота');
+                console.error('Ошибка:', error);
+                document.getElementById('status').textContent = 'Произошла ошибка: ' + error.message;
             });
         });
 
         function updateLogs() {
             fetch('http://45.133.216.252:5000/logs')
             .then(response => response.json())
+            .then(logs => {
+                document.getElementById('logContent').innerText = logs.join('\n');
+            })
+            .catch(error => console.error('Ошибка при получении логов:', error));
+        }
+
+        // Обновляем логи каждые 5 секунд
+        setInterval(updateLogs, 5000);
+    </script>
+</body>
+</html>
